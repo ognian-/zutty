@@ -1,6 +1,22 @@
 cmake_minimum_required(VERSION 3.10)
 project(zutty VERSION 0.12)
 
+if(${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD")
+  set(PLATFORM_DEFINES "-DBSD -DFREEBSD")
+endif()
+
+if(${CMAKE_SYSTEM_NAME} MATCHES "OpenBSD")
+  set(PLATFORM_DEFINES "-DBSD -DOPENBSD")
+endif()
+
+if(${CMAKE_SYSTEM_NAME} MATCHES "NetBSD")
+  set(PLATFORM_DEFINES "-DBSD")
+endif()
+
+if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+  set(PLATFORM_DEFINES "-DLINUX")
+endif()
+
 add_executable(zutty
 	src/charvdev.cc
 	src/font.cc
@@ -22,15 +38,18 @@ target_compile_options(zutty PUBLIC
 	-Wextra
 	-pedantic
 	-Werror
-	-fsanitize=thread
+	-Wno-variadic-macros
 	-O3 -g
 	-DZUTTY_VERSION=\"${PROJECT_VERSION}\"
+	${PLATFORM_DEFINES}
 	-I/usr/include/freetype2
+	-I/usr/local/include/freetype2
+	-I/usr/local/include
 	-I/usr/include/libpng16)
 
 target_link_options(zutty PUBLIC
-	-fsanitize=thread
 	-pthread
+	-L/usr/local/lib
 	-lfreetype
 	-lEGL
 	-lGLESv2
