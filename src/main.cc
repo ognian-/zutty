@@ -355,7 +355,7 @@ setArgv0 (char* argv0)
 }
 
 static void
-sighandler (int sig, siginfo_t* info, void* ucontext)
+sighandler (int sig, siginfo_t* info, void* /*ucontext*/)
 {
    if (sig == SIGCHLD)
    {
@@ -452,7 +452,7 @@ pasteCb (bool success, const std::string& content)
 }
 
 static bool
-onKeyPress (XEvent& event, XIC& xic, int ptyFd)
+onKeyPress (XEvent& event, XIC& xic, int /*ptyFd*/)
 {
    using Key = VtKey;
    XKeyEvent& xkevt = event.xkey;
@@ -748,11 +748,11 @@ mouseProtoSend (MouseTrackingEnc enc, int eventType, unsigned int modstate,
    switch (enc)
    {
    case MouseTrackingEnc::Default:
-      oss << "\e[M" << (char)(32 + cb) << (char)(32 + cx) << (char)(32 + cy);
+      oss << "\x1b[M" << (char)(32 + cb) << (char)(32 + cx) << (char)(32 + cy);
       vt->writePty (oss.str ().c_str ());
       break;
    case MouseTrackingEnc::UTF8:
-      oss << "\e[M";
+      oss << "\x1b[M";
       using zutty::Utf8Encoder;
       Utf8Encoder::pushUnicode (32 + cb, [&] (char ch) { oss << ch; });
       Utf8Encoder::pushUnicode (32 + cx, [&] (char ch) { oss << ch; });
@@ -760,12 +760,12 @@ mouseProtoSend (MouseTrackingEnc enc, int eventType, unsigned int modstate,
       vt->writePty (oss.str ().c_str ());
       break;
    case MouseTrackingEnc::SGR:
-      oss << "\e[<" << cb << ";" << cx << ";" << cy
+      oss << "\x1b[<" << cb << ";" << cx << ";" << cy
           << (eventType == ButtonRelease ? "m" : "M");
       vt->writePty (oss.str ().c_str ());
       break;
    case MouseTrackingEnc::URXVT:
-      oss << "\e[" << cb + 32 << ";" << cx << ";" << cy << "M";
+      oss << "\x1b[" << cb + 32 << ";" << cx << ";" << cy << "M";
       vt->writePty (oss.str ().c_str ());
       break;
    }
@@ -1004,12 +1004,12 @@ x11Event (XEvent& event, XIC& xic, int ptyFd, bool& destroyed, bool& holdPtyIn)
       break;
    case FocusIn:
       if (vt->getMouseTrackingState ().focusEventMode)
-         vt->writePty ("\e[I");
+         vt->writePty ("\x1b[I");
       vt->setHasFocus (true);
       break;
    case FocusOut:
       if (vt->getMouseTrackingState ().focusEventMode)
-         vt->writePty ("\e[O");
+         vt->writePty ("\x1b[O");
       vt->setHasFocus (false);
       break;
    case PropertyNotify:
@@ -1134,7 +1134,7 @@ handleOsc (int cmd, const std::string& arg)
                if (success)
                {
                   std::ostringstream oss;
-                  oss << "\e]52;;" << zutty::base64::encode (content) << "\e\\";
+                  oss << "\x1b]52;;" << zutty::base64::encode (content) << "\x1b\\";
                   vt->writePty (oss.str ().c_str ());
                }
                else if (++it != iend)

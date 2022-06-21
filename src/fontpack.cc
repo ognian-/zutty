@@ -54,7 +54,7 @@ namespace
    }
 
    int
-   fontFileFilter (const char* fpath, const struct stat* sb,
+   fontFileFilter (const char* fpath, const struct stat* /*sb*/,
                    int tflag, struct FTW* ftwbuf)
    {
       // If we have just emerged from a directory where fonts were found,

@@ -614,7 +614,7 @@ namespace zutty
       , nRows (nRows_)
       , cells (cells_)
    {
-   };
+   }
 
    CharVdev::Mapping::~Mapping ()
    {
@@ -622,7 +622,7 @@ namespace zutty
 
       glUnmapBuffer (GL_SHADER_STORAGE_BUFFER);
       cells = nullptr;
-   };
+   }
 
    CharVdev::Mapping CharVdev::getMapping ()
    {
@@ -634,7 +634,7 @@ namespace zutty
                                    GL_MAP_READ_BIT | GL_MAP_WRITE_BIT));
 
       return CharVdev::Mapping (nCols, nRows, cells);
-   };
+   }
 
    // private methods
 
