@@ -13,6 +13,7 @@
 
 #include "frame.h"
 #include "utf8.h"
+#include "shared_state.h"
 
 #include <cstdint>
 #include <functional>
@@ -78,7 +79,8 @@ namespace zutty
    class Vterm
    {
    public:
-      Vterm (uint16_t glyphPx, uint16_t glyphPy,
+      Vterm (shared_state& sh_state,
+             uint16_t glyphPx, uint16_t glyphPy,
              uint16_t winPx, uint16_t winPy,
              int ptyFd);
 
@@ -307,6 +309,8 @@ namespace zutty
 
       void osc_PaletteQuery (int, const std::string&);
       void osc_DynamicColorQuery (int, const std::string&);
+
+      shared_state& sh_state_;
 
       uint16_t winPx;
       uint16_t winPy;

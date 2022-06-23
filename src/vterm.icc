@@ -317,7 +317,7 @@ namespace zutty
 
       if (altScreenBufferMode_)
       {
-         frame_alt = Frame (winPx, winPy, nCols, nRows,
+         frame_alt = Frame (sh_state_, winPx, winPy, nCols, nRows,
                             marginTop, marginBottom);
          cf = &frame_alt;
          cf->expose ();
@@ -508,6 +508,7 @@ namespace zutty
    inline void
    Vterm::placeGraphicChar ()
    {
+      std::unique_lock<std::mutex> lock(sh_state_.input_mtx_);
       auto pt = utf8dec.getUnicode ();
       auto w = wcwidth (pt);
 

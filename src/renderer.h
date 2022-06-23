@@ -13,12 +13,11 @@
 
 #include "charvdev.h"
 #include "frame.h"
+#include "shared_state.h"
 
-#include <condition_variable>
 #include <cstdint>
 #include <functional>
 #include <memory>
-#include <mutex>
 #include <thread>
 
 namespace zutty
@@ -26,7 +25,8 @@ namespace zutty
    class Renderer
    {
    public:
-      Renderer (const std::function <void ()>& initDisplay,
+      Renderer (shared_state& sh_state,
+                const std::function <void ()>& initDisplay,
                 const std::function <void ()>& swapBuffers,
                 Fontpack* fontpk);
 
@@ -35,14 +35,12 @@ namespace zutty
       void update (const Frame& frame);
 
    private:
+      shared_state& sh_state_;
       std::unique_ptr <CharVdev> charVdev;
       const std::function <void ()> swapBuffers;
       Frame nextFrame;
       uint64_t seqNo = 0;
       bool done = false;
-
-      std::condition_variable cond;
-      std::mutex mx;
       std::thread thr;
 
       void renderThread (const std::function <void ()>& initDisplay,

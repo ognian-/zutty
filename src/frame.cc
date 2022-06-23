@@ -14,9 +14,10 @@
 
 namespace zutty
 {
-   Frame::Frame () {}
+   Frame::Frame (shared_state& sh_state) : sh_state_{&sh_state} {}
 
-   Frame::Frame (uint16_t winPx_, uint16_t winPy_,
+   Frame::Frame (shared_state& sh_state,
+                 uint16_t winPx_, uint16_t winPy_,
                  uint16_t nCols_, uint16_t nRows_,
                  uint16_t& marginTop_, uint16_t& marginBottom_,
                  uint16_t saveLines_)
@@ -25,6 +26,7 @@ namespace zutty
       , nCols (nCols_)
       , nRows (nRows_)
       , saveLines (saveLines_)
+      , sh_state_{&sh_state}
       , scrollHead (0)
       , marginTop (0)
       , marginBottom (nRows + saveLines)
@@ -116,6 +118,7 @@ namespace zutty
    void
    Frame::fullCopyCells (CharVdev::Cell * const dst)
    {
+      std::unique_lock<std::mutex> lock(sh_state_->input_mtx_);
       CharVdev::Cell* p = dst;
       for (int pY = 0; pY < nRows; ++pY)
       {
@@ -127,6 +130,7 @@ namespace zutty
    void
    Frame::deltaCopyCells (CharVdev::Cell * const dst)
    {
+      std::unique_lock<std::mutex> lock(sh_state_->input_mtx_);
       CharVdev::Cell* p = dst;
       for (int pY = -viewOffset; pY < nRows - viewOffset; ++pY)
       {

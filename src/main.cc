@@ -48,6 +48,8 @@ using zutty::VtModifier;
 using zutty::Renderer;
 using zutty::SelectionManager;
 
+static shared_state sh_state;
+
 static std::unique_ptr <Fontpack> fontpk = nullptr;
 static std::unique_ptr <Renderer> renderer = nullptr;
 static std::unique_ptr <Vterm> vt = nullptr;
@@ -1402,6 +1404,7 @@ main (int argc, char* argv[])
    selMgr = std::make_unique <SelectionManager> (xDisplay, xWindow);
 
    renderer = std::make_unique <Renderer> (
+      sh_state,
       [eglDpy, eglSurface, eglCtx] ()
       {
          if (!eglMakeCurrent (eglDpy, eglSurface, eglSurface, eglCtx))
@@ -1417,7 +1420,7 @@ main (int argc, char* argv[])
 
    setupSignals ();
    int ptyFd = startShell (progPath, shArgv);
-   vt = std::make_unique <Vterm> (fontpk->getPx (), fontpk->getPy (),
+   vt = std::make_unique <Vterm> (sh_state, fontpk->getPx (), fontpk->getPy (),
                                   winWidth, winHeight, ptyFd);
    vt->setRefreshHandler ([] (const zutty::Frame& f) { renderer->update (f); });
    vt->setOscHandler ([] (int cmd, const std::string& arg)

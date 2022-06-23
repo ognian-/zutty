@@ -575,10 +575,12 @@ namespace zutty
       uc_IsoUK
    };
 
-   Vterm::Vterm (uint16_t glyphPx_, uint16_t glyphPy_,
+   Vterm::Vterm (shared_state& sh_state,
+                 uint16_t glyphPx_, uint16_t glyphPy_,
                  uint16_t winPx_, uint16_t winPy_,
                  int ptyFd_)
-      : winPx (winPx_)
+      : sh_state_{sh_state}
+      , winPx (winPx_)
       , winPy (winPy_)
       , nCols ((winPx - 2 * opts.border) / glyphPx_)
       , nRows ((winPy - 2 * opts.border) / glyphPy_)
@@ -588,8 +590,9 @@ namespace zutty
       , onRefresh ([] (const Frame&) {})
       , onOsc ([] (int cmd, const std::string& arg)
                { logU << "OSC: '" << cmd << ";" << arg << "'" << std::endl; })
-      , frame_pri (winPx, winPy, nCols, nRows, marginTop, marginBottom,
+      , frame_pri (sh_state, winPx, winPy, nCols, nRows, marginTop, marginBottom,
                    opts.saveLines)
+      , frame_alt{sh_state}
       , cf (&frame_pri)
       , utf8dec ([this] () { placeGraphicChar (); })
       , nColsEff (nCols)
@@ -638,7 +641,7 @@ namespace zutty
 
       if (altScreenBufferMode)
       {
-         frame_alt = Frame (winPx, winPy, nCols_, nRows_,
+         frame_alt = Frame (sh_state_, winPx, winPy, nCols_, nRows_,
                             marginTop, marginBottom);
       }
       else

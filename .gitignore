@@ -3,3 +3,4 @@
 build/
 README.html
 doc/*.html
+.vscode

@@ -13,15 +13,17 @@
 
 #include "charvdev.h"
 #include "utf8.h"
+#include "shared_state.h"
 
 namespace zutty
 {
    class Frame
    {
    public:
-      Frame ();
+      explicit Frame (shared_state& sh_state);
 
-      Frame (uint16_t winPx_, uint16_t winPy_,
+      Frame (shared_state& sh_state,
+             uint16_t winPx_, uint16_t winPy_,
              uint16_t nCols_, uint16_t nRows_,
              uint16_t& marginTop_, uint16_t& marginBottom_,
              uint16_t saveLines_ = 0);
@@ -89,6 +91,7 @@ namespace zutty
       uint16_t saveLines = 0;
 
    private:
+      shared_state* sh_state_;
       uint16_t scrollHead;   // row offset of scrolling area's logical top row
       uint16_t marginTop;    // current margin top (number of rows above)
       uint16_t marginBottom; // current margin bottom (number of rows above + 1)

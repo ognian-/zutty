@@ -23,6 +23,7 @@ target_compile_options(zutty PUBLIC
 	-pedantic
 	-Werror
 	-fsanitize=thread
+	-O3 -g
 	-DZUTTY_VERSION=\"${PROJECT_VERSION}\"
 	-I/usr/include/freetype2
 	-I/usr/include/libpng16)

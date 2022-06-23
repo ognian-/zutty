@@ -15,32 +15,35 @@
 
 namespace zutty
 {
-   Renderer::Renderer (const std::function <void ()>& initDisplay,
+   Renderer::Renderer (shared_state& sh_state,
+                       const std::function <void ()>& initDisplay,
                        const std::function <void ()>& swapBuffers_,
                        Fontpack* fontpk)
-      : swapBuffers {swapBuffers_}
+      : sh_state_{sh_state}
+      , swapBuffers {swapBuffers_}
+      , nextFrame{sh_state}
       , thr (&Renderer::renderThread, this, initDisplay, fontpk)
    {
    }
 
    Renderer::~Renderer ()
    {
-      std::unique_lock <std::mutex> lk (mx);
+      std::unique_lock <std::mutex> lk (sh_state_.renderer_mtx_);
       done = true;
       nextFrame.seqNo = ++seqNo;
       lk.unlock ();
-      cond.notify_one ();
+      sh_state_.renderer_cond_.notify_one ();
       thr.join ();
    }
 
    void
    Renderer::update (const Frame& frame)
    {
-      std::unique_lock <std::mutex> lk (mx);
+      std::unique_lock <std::mutex> lk (sh_state_.renderer_mtx_);
       nextFrame = frame;
       nextFrame.seqNo = ++seqNo;
       lk.unlock ();
-      cond.notify_one ();
+      sh_state_.renderer_cond_.notify_one ();
    }
 
    void
@@ -51,13 +54,13 @@ namespace zutty
 
       charVdev = std::make_unique <CharVdev> (fontpk);
 
-      Frame lastFrame;
+      Frame lastFrame{sh_state_};
       bool delta = false;
 
       while (1)
       {
-         std::unique_lock <std::mutex> lk (mx);
-         cond.wait (lk,
+         std::unique_lock <std::mutex> lk (sh_state_.renderer_mtx_);
+         sh_state_.renderer_cond_.wait (lk,
                     [&] ()
                     {
                        return lastFrame.seqNo != nextFrame.seqNo;
@@ -70,8 +73,7 @@ namespace zutty
             delta = false;
 
          lastFrame = nextFrame;
-         lk.unlock ();
-
+         
          if (charVdev->resize (lastFrame.winPx, lastFrame.winPy))
             delta = false;
 
