@@ -18,18 +18,18 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 endif()
 
 add_executable(zutty
-	src/charvdev.cc
-	src/font.cc
-	src/fontpack.cc
-	src/frame.cc
-	src/gl.cc
-	src/log.cc
-	src/main.cc
-	src/options.cc
-	src/pty.cc
-	src/renderer.cc
-	src/selmgr.cc
-	src/vterm.cc
+    src/charvdev.cc
+    src/font.cc
+    src/fontpack.cc
+    src/frame.cc
+    src/gl.cc
+    src/log.cc
+    src/main.cc
+    src/options.cc
+    src/pty.cc
+    src/renderer.cc
+    src/selmgr.cc
+    src/vterm.cc
 )
 
 target_compile_options(zutty PUBLIC
