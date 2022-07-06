@@ -424,7 +424,7 @@ startShell (const char* execPath, const char* const argv[])
 }
 
 static VtModifier
-convertKeyState (KeySym ks, unsigned int state)
+convertKeyState (KeySym /* ks */, unsigned int state)
 {
    VtModifier mod = VtModifier::none;
    if (state & ShiftMask)
