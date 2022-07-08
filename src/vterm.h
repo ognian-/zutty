@@ -92,6 +92,9 @@ namespace zutty
       using OscHandlerFn = std::function <void (int, const std::string&)>;
       void setOscHandler (const OscHandlerFn&);
 
+      using BellHandlerFn = std::function <void ()>;
+      void setBellHandler (const BellHandlerFn&);
+
       void resize (uint16_t winPx, uint16_t winPy);
 
       void redraw ();
@@ -323,6 +326,7 @@ namespace zutty
       RefreshHandlerFn onRefresh;
       OscHandlerFn onOsc;
       bool haveOscHandler = false;
+      BellHandlerFn onBell;
 
       // Cell storage, display and input state
 
